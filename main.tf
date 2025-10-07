@@ -1,40 +1,54 @@
 terraform {
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
-      version = "4.47.0"
+      source  = "hashicorp/azurerm"
+      version = "4.44.0"
     }
   }
 }
 
 provider "azurerm" {
-  features{}
-  fearesource "azurerm_resource_group" "example" {
-  name     = "example-resources"
+  features {}
+
+}
+
+resource "azurerm_resource_group" "rg" {
+  name     = "T_ResourceGroup"
   location = "West Europe"
 }
 
-resource "azurerm_kubernetes_cluster" "example" {
-  name                = "example-aks1"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  dns_prefix          = "exampleaks1"
-
-  default_node_pool {
-    name       = "default"
-    node_count = 1
-    vm_size    = "Standard_D2_v2"
-  }
+resource "azurerm_service_plan" "asp" {
+  name                = "T_plan"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  os_type             = "Linux"
+  sku_name            = "B1"
 }
 
-resource "azurerm_kubernetes_cluster_node_pool" "example" {
-  name                  = "internal"
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.example.id
-  vm_size               = "Standard_DS2_v2"
-  node_count            = 1
+resource "azurerm_linux_web_app" "awa" {
+  name                = "T-web-app"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_service_plan.asp.location
+  service_plan_id     = azurerm_service_plan.asp.id
 
-  tags = {
-    Environment = "Production"
-  }
+  site_config {}
 }
+
+resource "azurerm_linux_web_app_slot" "awas" {
+  name           = "T-web-slot"
+  app_service_id = azurerm_linux_web_app.awa.id
+
+  site_config {}
+}
+
+resource "azurerm_web_app_active_slot" "example" {
+  slot_id = azurerm_linux_web_app_slot.awas.id
+}
+
+resource "azurerm_container_registry" "acr" {
+  name                = "containerRegistry1"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Basic"
+  admin_enabled       = false
 }
