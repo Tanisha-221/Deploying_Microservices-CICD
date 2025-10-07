@@ -40,8 +40,11 @@ jobs:
          ignore-unfixed: true
          vuln-type: 'os,library'
 
+    - name: "Cleanup Trivy files "
+      run: rm -f trivy_envs.txt
+
     - name: Save Docker image as artifact
-      run: docker save myapp -o myapp.tar
+      run: docker save my-nodejs-app:latest -o myapp.tar
     - name: Upload Docker Image Artifact
       uses: actions/upload-artifact@v4
       with:
