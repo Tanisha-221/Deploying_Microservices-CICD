@@ -9,6 +9,7 @@ on:
 jobs:
 
   build:
+    Deploy:
 
     runs-on: ubuntu-latest
 
@@ -17,6 +18,27 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
       
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v5.0.0
+    - name: Download Docker Image Artifact
+      uses: actions/download-artifact@v4
       with:
+        name: docker-image  
+    - name: Load Docker image
+      run: docker load -i myapp.tar 
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}   
+    - name: Push to Azure Container Registry
+      run: |
+        az acr login --name containerRegistry1
+        docker tag my-nodejs-app:latest containerRegistry1.azurecr.io/my-nodejs-app:latest
+        docker push containerRegistry1.azurecr.io/my-nodejs-app:latest  
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: T-web-app
+        images: containerRegistry1.azurecr.io/my-nodejs-app:latest  
+        slot-name: T-web-slot
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1A2B3C4D5E6F7G8H9I }}
+        package: .
