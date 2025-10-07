@@ -1,15 +1,103 @@
 name: Docker Image CI
 
 on:
-  workflow_run:
-    workflows: [Terraform CI/CD]
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 jobs:
-
-  build-test & scan:
-    name: Build, Test & Scans 
+  build: 
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    environment: production 
+    
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+   
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node.js environment $matrix.node-version
+      uses: actions/setup-node@v5.0.0
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm install
+
+    - name: "Building command"
+      run: npm run build 
+
+unit-testing:
+
+     runs-on: ubuntu-latest
+
+     strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+
+     steps:
+     - uses: actions/checkout@v4
+     - name: Use Node.js $matrix.node-version
+       uses: actions/setup-node@v5.0.0
+       with:
+         node-version: ${{ matrix.node-version }}
+         cache: 'npm'
+     - name: Install dependencies
+       run: npm install 
+
+     - name: "Running Unit Tests"
+       run: npm run test 
+
+Security-check:
+
+     runs-on: ubuntu-latest
+
+     strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+
+     steps:
+     - uses: actions/checkout@v4
+     - name: Use Node.js $matrix.node-version
+       uses: actions/setup-node@v5.0.0
+       with:
+         node-version: ${{ matrix.node-version }}
+         cache: 'npm'
+     - name: Install dependencies
+       run: npm install 
+
+     - name: "Running Security Checks"
+       run: npm audit --audit-level=moderate  
+
+     - name: "Trivy Scan for Docker Image"
+       uses: aquasecurity/trivy-action@master
+       with:
+         image-ref: my-nodejs-app:latest
+         format: 'table'
+         exit-code: '1'
+         severity: 'CRITICAL,HIGH'
+         ignore-unfixed: true
+         vuln-type: 'os,library'
+
+Build Docker Image:
+
+     runs-on: ubuntu-latest
+
+     steps:
+     - uses: actions/checkout@v4
+     - name: Use Node.js $matrix.node-version
+       uses: actions/setup-node@v5.0.0
+       with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+     - name: Install dependencies
+       run: npm install 
+
+     - name: "Building Docker Image"
+       run: docker build -t myapp .  
+
+     - name: Save Docker image as artifact
+       uses: actions/upload-artifact@v4
+       with:
+        name: docker-image
+        path: .
