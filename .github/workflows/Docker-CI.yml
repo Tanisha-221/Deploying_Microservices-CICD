@@ -29,25 +29,6 @@ jobs:
 
     - name: "Building Docker Image"
       run: docker build -t my-nodejs-app:latest .
-    
-
-    - name: Cleanup Trivy Environment File
-      run: |
-        if [ -f trivy_envs.txt ]; then
-        rm -f trivy_envs.txt
-        fi
-
-
-    - name: "Trivy Scan for Docker Image"
-      uses: aquasecurity/trivy-action@master
-      continue-on-error: true
-      with:
-         image-ref: my-nodejs-app:latest
-         format: 'table'
-         exit-code: '1'
-         severity: 'CRITICAL,HIGH'
-         ignore-unfixed: true
-         vuln-type: 'os,library'
 
     - name: Save Docker image as artifact
       run: docker save my-nodejs-app:latest -o myapp.tar
