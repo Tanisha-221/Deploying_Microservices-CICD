@@ -21,7 +21,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: T-node-web-app
-        slot-name: T-node-web-app-slot
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1A2B3C4D5E6F7G8H9I }}
         images: dockerregistryt432163.azurecr.io/my-nodejs-app:latest
-     
