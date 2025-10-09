@@ -10,7 +10,7 @@ jobs:
   build: 
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    
+
     steps:
     - uses: actions/checkout@v4
     - name: Setup Node.js environment
@@ -28,12 +28,17 @@ jobs:
     - name: Azure Login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}   
-    - name: Push to Azure Container Registry
-      run: |
-        az acr login --name containerRegistry1
-        docker tag my-nodejs-app:latest containerRegistry1.azurecr.io/my-nodejs-app:latest
-        docker push containerRegistry1.azurecr.io/my-nodejs-app:latest  
+        creds: ${{ secrets.AZURE_CREDENTIALS }} 
+
+    - name: Login to ACR
+      run: az acr login --name dockerregistryt432163
+
+      
+    # - name: Push to Azure Container Registry
+    #   run: |
+    #     az acr login --name containerRegistry1
+    #     docker tag my-nodejs-app:latest containerRegistry1.azurecr.io/my-nodejs-app:latest
+    #     docker push containerRegistry1.azurecr.io/my-nodejs-app:latest  
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
