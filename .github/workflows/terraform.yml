@@ -41,7 +41,9 @@ jobs:
     # Run Terraform Plan
     - name: Terraform Plan
       id: plan
-      run: terraform plan -out=tfplan.out   
+      run: terraform plan -out=tfplan.out 
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     # Upload the Terraform plan as an artifact
     - name: Upload artifact
@@ -60,3 +62,5 @@ jobs:
       id: apply
       run: |
         terraform apply -auto-approve tfplan.out
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
