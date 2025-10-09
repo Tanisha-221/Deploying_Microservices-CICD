@@ -1,7 +1,6 @@
 name: Docker Image CD
 
 on:
-  push:
     workflow_run:
       workflows: ["Docker Image CI"]
       types:
