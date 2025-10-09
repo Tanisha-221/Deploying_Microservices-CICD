@@ -39,11 +39,11 @@ jobs:
     - name: Login to ACR
       run: az acr login --name dockerregistryt432163
 
-    - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@v3
+    #- name: Setup Docker Buildx
+    #  uses: docker/setup-buildx-action@v3
 
-    # - name: Docker login
-    #  run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login dockerregistryt432163.azurecr.io -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+    - name: Docker login
+      run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login dockerregistryt432163.azurecr.io -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
 
     # - name: login to Azure Container Registry
     #   uses: docker/login-action@v2
