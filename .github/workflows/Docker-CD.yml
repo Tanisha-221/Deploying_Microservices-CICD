@@ -7,43 +7,21 @@ on:
       - completed
 
 jobs:
-  build: 
+  deploy:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v5.0.0
-      with:
-        node-version: 18
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: "Building command"
-      run: npm run build 
-  
     - name: Azure Login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }} 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Login to ACR
-      run: az acr login --name dockerregistryt432163
-
-      
-    # - name: Push to Azure Container Registry
-    #   run: |
-    #     az acr login --name containerRegistry1
-    #     docker tag my-nodejs-app:latest containerRegistry1.azurecr.io/my-nodejs-app:latest
-    #     docker push containerRegistry1.azurecr.io/my-nodejs-app:latest  
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: T-node-web-app
-        images: dockerregistryt432163.azurecr.io/my-nodejs-app:latest  
-        slot-name: T-node-web-app-slot 
+        slot-name: T-node-web-app-slot
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1A2B3C4D5E6F7G8H9I }}
-        package: .
+        images: dockerregistryt432163.azurecr.io/my-nodejs-app:latest
+     
