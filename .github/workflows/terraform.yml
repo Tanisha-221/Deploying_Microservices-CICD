@@ -60,5 +60,3 @@ jobs:
       id: apply
       run: |
         terraform apply -auto-approve tfplan.out
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
