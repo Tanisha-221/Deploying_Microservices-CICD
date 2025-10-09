@@ -6,50 +6,44 @@ on:
       - main
 
 jobs:
-  build: 
+  build:
     runs-on: ubuntu-latest
-   
+
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Setup Node.js environment
-      uses: actions/setup-node@v5.0.0
+      uses: actions/setup-node@v3
       with:
         node-version: 18
         cache: 'npm'
+
     - name: Install dependencies
       run: npm ci
 
-    - name: "Building command"
-      run: npm run build 
-    - name: "Running Unit Tests"
-      run: npm run test 
+    - name: Build project
+      run: npm run build
 
-    - name: "Running Security Checks"
-      run: npm audit --audit-level=moderate 
+    - name: Run unit tests
+      run: npm run test
+
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
 
     - name: Azure Login
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURECREDENTIALS }}    
+        creds: ${{ secrets.AZURECREDENTIALS }}
 
-    - name: "Login to Azure Container Registry"
-      run: az acr login --name dockerregistryt432163 
+    - name: Docker login to Azure Container Registry
+      uses: azure/docker-login@v1
       with:
-        - uses: actions/checkout@v2
-    - uses: azure/docker-login@v1
-      with:
-        login-server: mycontainer.azurecr.io
+        login-server: dockerregistryt432163.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-    - run: |
-        docker build . -t mycontainer.azurecr.io/myapp:${{ github.sha }}
-        docker push mycontainer.azurecr.io/myapp:${{ github.sha }}  
 
-    - name: "Building Docker Image"
-      run: docker build -t my-nodejs-app:latest .
-    
-    - name: Push to Azure Container Registry
+    - name: Build and push Docker image
       run: |
-        az acr login --name dockerregistryt432163
-        docker tag my-nodejs-app:latest dockerregistryt432163.azurecr.io/my-nodejs-app:latest
+        docker build -t dockerregistryt432163.azurecr.io/my-nodejs-app:latest .
         docker push dockerregistryt432163.azurecr.io/my-nodejs-app:latest
