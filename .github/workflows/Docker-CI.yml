@@ -3,7 +3,7 @@ name: Docker Image CI
 on:
   push:
     branches:
-      - main
+      - Pipeline-fix
 
 jobs:
   build:
@@ -41,7 +41,7 @@ jobs:
 
     - name: Docker login
       run: docker login dockerregistryt432163.azurecr.io -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
-      
+
     # - name: login to Azure Container Registry
     #   uses: docker/login-action@v2
     #   with:
