@@ -35,9 +35,8 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Docker login to Azure Container Registry
-      uses: azure/docker-login@v1
+    - name: "Login to Azure Container Registry"
+      run: az acr login --name dockerregistryt432163 
       with:
         login-server: dockerregistryt432163.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
