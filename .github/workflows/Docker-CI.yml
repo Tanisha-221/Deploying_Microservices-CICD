@@ -34,7 +34,7 @@ jobs:
 
     - name: "Login to Azure Container Registry"
       run: az acr login --name dockerregistryt432163 
-      witht:
+      with:
         - uses: actions/checkout@v2
     - uses: azure/docker-login@v1
       with:
