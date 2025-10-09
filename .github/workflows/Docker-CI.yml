@@ -27,23 +27,27 @@ jobs:
     - name: "Running Security Checks"
       run: npm audit --audit-level=moderate 
 
-    - name: "Building Docker Image"
-      run: docker build -t my-nodejs-app:latest .
-
-    - name: Save Docker image as artifact
-      run: docker save my-nodejs-app:latest -o myapp.tar
-
-    - name: Upload Docker Image Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-image
-        path: myapp.tar
-    
     - name: Azure Login
       uses: azure/login@v1
       with:
-       creds: ${{ secrets.AZURE_CREDENTIALS }}
+        creds: ${{ secrets.AZURECREDENTIALS }}    
 
+    - name: "Login to Azure Container Registry"
+      run: az acr login --name dockerregistryt432163 
+      witht:
+        - uses: actions/checkout@v2
+    - uses: azure/docker-login@v1
+      with:
+        login-server: mycontainer.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    - run: |
+        docker build . -t mycontainer.azurecr.io/myapp:${{ github.sha }}
+        docker push mycontainer.azurecr.io/myapp:${{ github.sha }}  
+
+    - name: "Building Docker Image"
+      run: docker build -t my-nodejs-app:latest .
+    
     - name: Push to Azure Container Registry
       run: |
         az acr login --name dockerregistryt432163
