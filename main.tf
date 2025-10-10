@@ -39,6 +39,10 @@ resource "azurerm_web_app_active_slot" "example" {
   slot_id = azurerm_linux_web_app_slot.awas.id
 }
 
-module "acr" {
-  source = "./modules/acr"
+resource "azurerm_container_registry" "acr" {
+  name                = "dockerregistryt432163"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Basic"
+  admin_enabled       = true
 }
