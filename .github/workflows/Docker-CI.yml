@@ -70,6 +70,7 @@ jobs:
         images: dockerregistryt432163.azurecr.io/my-nodejs-app
         tags: |
           latest
+          ${{ github.sha }}
         
     - name: Build and push Docker image
       uses: docker/build-push-action@v4    
