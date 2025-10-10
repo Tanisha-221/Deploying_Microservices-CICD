@@ -35,6 +35,10 @@ resource "azurerm_linux_web_app" "awa" {
   location            = azurerm_service_plan.asp.location
   service_plan_id     = azurerm_service_plan.asp.id
 
+  app_settings = {
+    "WEBSITES_PORT" = "3000"
+  }
+
   site_config {}
 }
 
