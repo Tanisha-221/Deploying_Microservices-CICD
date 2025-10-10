@@ -68,7 +68,9 @@ jobs:
       uses: docker/metadata-action@v4
       with:
         images: dockerregistryt432163.azurecr.io/my-nodejs-app
-
+        tags: |
+          latest
+        
     - name: Build and push Docker image
       uses: docker/build-push-action@v4    
       with:
